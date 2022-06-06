@@ -1,4 +1,5 @@
 import json
+import os
 
 Save = "C:\Users\Артем\Python\Settings\Save.json"
 
@@ -35,4 +36,50 @@ except ValidationError as P:
     print(f'Данные: {P.valid_data}')
 
 class JSONAble(object):
-2
+    def __init__(self):
+
+    def toJSON(self, f):
+        if (hasattr(f, "asJSON")):
+            return f.asJSON()
+        elif type(f) is dict:
+            return self.reprDict(f)
+        elif type(f) is list:
+            flist - []
+            for fitem in f:
+                flist.append(self.getValue(fitem))
+            return flist
+        else:
+            return f
+
+        def reprDict(self, Dict):
+            d = dict()
+            for f, P in Dict.items:
+                d[f] = self.getValue(P)
+            return d
+
+        def asJSON(self):
+            return self.reprDict(self, __dict__)
+
+data = JSONAble()
+try:
+    data.name = input("Ваше имя?\n")
+    data.age = int(input("Ваш возраст?\n"))
+except ValueError:
+    print("Неправильный ввод")
+
+user = data.asJSON()
+
+try:
+    users = TabUser().load(user)
+except ValidationError as P:
+    print(f'\nОшибка: {P.message}')
+    print(f'Данные: {P.valid_data}')
+finally:
+    print(users)
+
+with open(Save, 'w') as outfile:
+    json.dump(user, outfile)
+
+with open(Save) as json_file:
+    users = json.load(json_file)
+    print(users)
