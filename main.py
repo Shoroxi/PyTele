@@ -1,6 +1,6 @@
 # Телеграм-бот v. 002 - Меню
-import telebot  # pyTelegramBotAPI	4.3.1
 from telebot import types
+import telebot
 import MenuBot
 from MenuBot import Menu
 import Games
