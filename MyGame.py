@@ -1,15 +1,20 @@
 from telebot import types
 import telebot
 import random
-from MenuBot import goto_menu
-import json
-
-from menu_markup import gen_menu_keyboard
-from translation import Translation
-
+import MenuBot
+from MenuBot import Menu
 
 bot = telebot.TeleBot(
     '5241329098:AAFwTwBMDbk8fD-GVHlXBlz52jI9X4SWoVk')
+
+
+def goto_menu(bot, chat_id, name_menu):
+    # получение нужного элемента меню
+    cur_menu = Menu.getCurMenu(chat_id)
+    if name_menu == "Выход" and cur_menu != None and cur_menu.parent != None:
+        target_menu = Menu.getMenu(chat_id, cur_menu.parent.name)
+    else:
+        target_menu = Menu.getMenu(chat_id, name_menu)
 
 
 class Slots:
@@ -19,11 +24,10 @@ class Slots:
 
     # Поток обработки сообщений
     @staticmethod
-    def main_slots(message, bot):
+    def main_Slots(message, bot):
 
         markup = types.ReplyKeyboardMarkup(row_width=3, resize_keyboard=True)
-        b = types.ReplyKeyboardMarkup(Translation.get_slots_menu_expression("spin", message.from_user.id))
-        button_list = ['spin']
+        button_list = ['Крутить']
         markup.add(*button_list)
         bot.send_message(message.from_user.id, text="Вернулись в главное меню", reply_markup=markup)
 
@@ -31,11 +35,11 @@ class Slots:
     def callback_inline(cls, message, bot):
         cls.__flag = True
 
-        if message.text == "Slots":
-            cls.main_slots(message, bot)
+        if message.text == "Слоты":
+            cls.main_Slots(message, bot)
             return
 
-        if message.text == 'spin':
+        if message.text == 'Крутить':
             i = 0
             array = []
 
@@ -61,36 +65,26 @@ class Slots:
                 i += 1
 
             markup = types.ReplyKeyboardMarkup(row_width=3, resize_keyboard=True)
-            button_list = ['spin', "Выход"]
+            button_list = ['Крутить', "Выход"]
             markup.add(*button_list)
 
-            # Крепление inline-меню (кнопки "Spin!" и "Exit") и вывод слотов пользователю
-            message_string = Translation.get_slots_menu_expression("output", message.from_user.id)
+            # Крепление inline-меню (кнопки "Крутить!" и "Exit") и вывод слотов пользователю
 
-            bot.send_message(message.from_user.id, text="{}\n{}{}{}\n{}{}{}\n{}{}{}".format(message_string, *new_array), reply_markup=markup)
+            bot.send_message(message.from_user.id, text="\n{}{}{}\n{}{}{}\n{}{}{}".format(*new_array),
+                             reply_markup=markup)
 
             # При удовлетворении условию выводится уведомление с поздравлением
             if new_array[0] == new_array[1] == new_array[2] or new_array[3] == new_array[4] == new_array[5] or \
                     new_array[6] == new_array[7] == new_array[8] or new_array[0] == new_array[3] == new_array[6] or \
                     new_array[1] == new_array[4] == new_array[7] or new_array[2] == new_array[5] == new_array[8]:
-                bot.answer_callback_query(callback_query_id=message.id, text="Jackpot!!!", show_alert=True)
+                bot.send_message(callback_query_id=message.id, text="Jackpot!!!", show_alert=True)
+
 
 def get_text_messages(bot, cur_user, message):
     chat_id = message.chat.id
     ms_text = message.text
 
-    if ms_text == "Menu":
-        bot.edit_message_text(chat_id=chat_id,
-                              reply_markup=gen_menu_keyboard(message.from_user.id, message.chat.type),
-                              text=Translation.get_menu_expression(key="choose_game", user_id=message.from_user.id),
-                              message_id=message.message_id)
-
-    elif ms_text == "language":
-        Translation.switch_language(message.from_user.id)
-        bot.edit_message_text(chat_id=chat_id,
-                              reply_markup=gen_menu_keyboard(message.from_user.id, message.message.chat.type),
-                              text=Translation.get_menu_expression(key="choose_game", user_id=message.from_user.id),
-                              message_id=message.message_id)
-
-    elif ms_text == "Slots" or message.text == 'spin':
+    if ms_text == "Слоты" or message.text == 'Крутить':
         Slots.callback_inline(message, bot)
+    elif ms_text == "Выход":
+        MenuBot.goto_menu(bot, chat_id, "Главное меню")

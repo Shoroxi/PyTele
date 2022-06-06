@@ -6,9 +6,10 @@ from MenuBot import Menu
 import Games
 import MyGame
 import DZ
+import Fun
 
 
-bot = telebot.Telebot('5241329098:AAFwTwBMDbk8fD-GVHlXBlz52jI9X4SWoVk')
+bot = telebot.TeleBot('5241329098:AAFwTwBMDbk8fD-GVHlXBlz52jI9X4SWoVk')
 
 
 # t.me/Artem_Boyarchenko_1MD4_bot # Создаем экземпляр бота @Artem_Boyarchenko_1MD4_bot
@@ -54,9 +55,6 @@ def get_text_messages(message):
             GameRPS = Games.newgame(chat_id, Games.RPS())  # создаём новый экземпляр игры и регистрируем его
             bot.send_photo(caption=GameRPS.text_rules, parse_mode='HTML')
 
-        # elif subMenu.name == "Слоты":
-        #     slots = GameRPS.newgame(chat_id, MyGame.Slots())
-
         return  # мы вошли в под-меню, и дальнейшая обработка не требуется
 
     # проверим, является ли текст текущий команды кнопкой действия
@@ -87,8 +85,6 @@ def callback_worker(call):
 
     if menu == "Игра К-Н-Б":
         Games.callback_worker(bot, cur_user, cmd, par, call)  # обработчик кнопок игры находится в модули игры
-
-
 
 
 # -----------------------------------------------------------------------
