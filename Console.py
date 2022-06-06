@@ -35,3 +35,4 @@ except ValidationError as P:
     print(f'Данные: {P.valid_data}')
 
 class JSONAble(object):
+2
