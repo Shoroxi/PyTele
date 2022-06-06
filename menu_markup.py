@@ -1,11 +1,9 @@
-"""
-Клавиатура главного меню.
-"""
+
 from telebot import types, TeleBot
 from translation import Translation
 
 bot = TeleBot(
-    '5494054794:AAG4jIdW1E5k4IaNIv5-LdZw9KhJR8o0-6g')
+    '5241329098:AAFwTwBMDbk8fD-GVHlXBlz52jI9X4SWoVk')
 
 def gen_menu_keyboard(user_id, chat_type):
     """
