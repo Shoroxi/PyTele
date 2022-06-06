@@ -1,5 +1,6 @@
 import json
 import os
+from marshmallow import Schema, fields, validate, post_load, ValidationError
 
 Save = "C:\Users\Артем\Python\Settings\Save.json"
 
@@ -11,7 +12,7 @@ class User(object):
     def __repr__(self):
         return f'Меня зовут {self.name}, Мне {self.age} лет'
 
-class TabUser(Tab):
+class TabUser(Schema):
     name = fields.String(missing='Неизвестный', default='Неизвестный', validate=validate.Lenght(min=1))
     age = fields.Integer(required=True, error_messages={'Требуется': 'Встаить свой возраст.'},
                          validate=validate.Range(min=0, max = None))
@@ -20,7 +21,7 @@ class TabUser(Tab):
         return User(**data)
 
 try:
-    data = json.load(open("Te.json", "r"))
+    data = json.load(open("Set.json", "r"))
     Users = TabUser().load(data)
 except ValidationError as P:
     print(f'\nОшибка: {P.message}')
@@ -36,7 +37,9 @@ except ValidationError as P:
     print(f'Данные: {P.valid_data}')
 
 class JSONAble(object):
+    global f, f_list
     def __init__(self):
+        self.f = f
 
     def toJSON(self, f):
         if (hasattr(f, "asJSON")):
@@ -44,10 +47,10 @@ class JSONAble(object):
         elif type(f) is dict:
             return self.reprDict(f)
         elif type(f) is list:
-            flist - []
+            f_list - []
             for fitem in f:
-                flist.append(self.getValue(fitem))
-            return flist
+                f_list.append(self.getValue(fitem))
+            return f_list
         else:
             return f
 
