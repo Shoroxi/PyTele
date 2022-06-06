@@ -8,8 +8,7 @@ import MyGame
 import DZ
 
 
-bot = telebot.TeleBot(
-    '5241329098:AAFwTwBMDbk8fD-GVHlXBlz52jI9X4SWoVk')
+bot = telebot.Telebot('5241329098:AAFwTwBMDbk8fD-GVHlXBlz52jI9X4SWoVk')
 
 
 # t.me/Artem_Boyarchenko_1MD4_bot # Создаем экземпляр бота @Artem_Boyarchenko_1MD4_bot
