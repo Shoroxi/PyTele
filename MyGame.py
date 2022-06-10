@@ -77,7 +77,7 @@ class Slots:
             if new_array[0] == new_array[1] == new_array[2] or new_array[3] == new_array[4] == new_array[5] or \
                     new_array[6] == new_array[7] == new_array[8] or new_array[0] == new_array[3] == new_array[6] or \
                     new_array[1] == new_array[4] == new_array[7] or new_array[2] == new_array[5] == new_array[8]:
-                bot.send_message(callback_query_id=message.id, text="Jackpot!!!", show_alert=True)
+                bot.send_message(message.chat.id, text="Джекпот!!!")
 
 
 def get_text_messages(bot, cur_user, message):

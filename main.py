@@ -4,9 +4,10 @@ import telebot
 import MenuBot
 from MenuBot import Menu
 import Games
-import MyGame
 import DZ
-import Fun
+import FUN
+from FUN import get_dog, get_anekdot
+import MyGame
 
 
 bot = telebot.TeleBot('5241329098:AAFwTwBMDbk8fD-GVHlXBlz52jI9X4SWoVk')
@@ -44,7 +45,6 @@ def get_text_messages(message):
     subMenu = MenuBot.goto_menu(bot, chat_id, ms_text)  # попытаемся использовать текст как команду меню, и войти в него
     if subMenu is not None:
         # Проверим, нет ли обработчика для самого меню. Если есть - выполним нужные команды
-
         if subMenu.name == "Игра в 21":
             game21 = Games.newgame(chat_id, Games.Game21(jokers_enabled=True))  # создаём новый экземпляр игры
             text_game = game21.get_cards(2)  # просим 2 карты в начале игры
@@ -94,6 +94,19 @@ def MediaCards(game21):
     for url in game21.arr_cards_URL:
         medias.append(types.InputMediaPhoto(url))
     return medias
+
+def get_text_messages(bot, cur_user, message):
+    chat_id = message.chat.id
+    ms_text = message.text
+
+    if ms_text == "Прислать собаку":
+        bot.send_message(chat_id, get_dog())
+
+    elif ms_text == "Прислать анекдот":
+        bot.send_message(chat_id, text=get_anekdot())
+
+    elif ms_text == "Помощь":
+        help(bot, chat_id)
 
 # -----------------------------------------------------------------------
 
