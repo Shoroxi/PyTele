@@ -1,6 +1,7 @@
 from telebot import types
 import telebot
 import random
+
 import MenuBot
 from MenuBot import Menu
 
@@ -8,38 +9,44 @@ bot = telebot.TeleBot(
     '5241329098:AAFwTwBMDbk8fD-GVHlXBlz52jI9X4SWoVk')
 
 
-def goto_menu(bot, chat_id, name_menu):
+def goto_menu(chat_id, name_menu):
     # получение нужного элемента меню
     cur_menu = Menu.getCurMenu(chat_id)
-    if name_menu == "Выход" and cur_menu != None and cur_menu.parent != None:
-        target_menu = Menu.getMenu(chat_id, cur_menu.parent.name)
+    if name_menu == "Выход" and cur_menu is not None and cur_menu.parent is not None:
+        Menu.getMenu(chat_id, cur_menu.parent.name)
     else:
-        target_menu = Menu.getMenu(chat_id, name_menu)
+        Menu.getMenu(chat_id, name_menu)
 
 
 class Slots:
+    players = []
+    values = [" ", " ", " ", " ", " ", " ", " ", " ", " "]
+    call_list = ["Крутить", "Слоты", "Статистика", "Выход"]
+
     @property
     def flag(self):
         return self.__flag
 
     # Поток обработки сообщений
     @staticmethod
-    def main_Slots(message, bot):
-
-        markup = types.ReplyKeyboardMarkup(row_width=3, resize_keyboard=True)
-        button_list = ['Крутить']
-        markup.add(*button_list)
-        bot.send_message(message.from_user.id, text="Вернулись в главное меню", reply_markup=markup)
+    def main_slots(call, bot):
+        keyboard = types.InlineKeyboardMarkup(row_width=3)
+        button = []
+        keyboard.add(*button)
+        bot.edit_message_text(chat_id=call.message.chat.id, reply_markup=keyboard, text="",
+                              message_id=call.message.message_id)
+        button.append(types.InlineKeyboardButton("Выход", callback_data='Выход'))
+        button.append(types.InlineKeyboardButton("Крутить", callback_data='Крутить'))
 
     @classmethod
-    def callback_inline(cls, message, bot):
+    def callback_inline(cls, call, bot, message):
+        keyboard = types.InlineKeyboardMarkup(row_width=3)
+        button = []
+        ms_text = message.text
         cls.__flag = True
 
-        if message.text == "Слоты":
-            cls.main_Slots(message, bot)
-            return
-
-        if message.text == 'Крутить':
+        # Код при нажатии
+        if call.data == 'Крутить' or ms_text == "Крутить":
             i = 0
             array = []
 
@@ -64,20 +71,28 @@ class Slots:
                     new_array.append("🍉")
                 i += 1
 
-            markup = types.ReplyKeyboardMarkup(row_width=3, resize_keyboard=True)
-            button_list = ['Крутить', "Выход"]
-            markup.add(*button_list)
+            # Удаление inline-кнопки у предыдущего сообщения (остаётся только сообщение "Слоты: ")
+            bot.edit_message_text(chat_id=call.message.chat.id, reply_markup=None, text=call.message.text,
+                                  message_id=call.message.message_id)
 
-            # Крепление inline-меню (кнопки "Крутить!" и "Exit") и вывод слотов пользователю
+            # Подготовка inline-кнопок "Spin!" и "Exit" к следующему сообщению
+            keyboard = types.InlineKeyboardMarkup(row_width=3)
+            b1 = button.append(types.InlineKeyboardButton("Крутить", callback_data='Крутить'))
+            b2 = button.append(types.InlineKeyboardButton("Выход", callback_data='Выход'))
+            keyboard.add(b1, b2)
 
-            bot.send_message(message.from_user.id, text="\n{}{}{}\n{}{}{}\n{}{}{}".format(*new_array),
-                             reply_markup=markup)
+            # Крепление inline-меню (кнопки "Spin!" и "Exit") и вывод слотов пользователю
 
+            bot.edit_message_text(chat_id=call.message.chat.id, reply_markup=keyboard,
+                                  text="{}\n{}{}{}\n{}{}{}\n{}{}{}".format(*new_array),
+                                  message_id=call.message.message_id)
+
+            # Проверка выигрыша (на данный момент просто проверка всех строк и столбцов)
             # При удовлетворении условию выводится уведомление с поздравлением
             if new_array[0] == new_array[1] == new_array[2] or new_array[3] == new_array[4] == new_array[5] or \
                     new_array[6] == new_array[7] == new_array[8] or new_array[0] == new_array[3] == new_array[6] or \
                     new_array[1] == new_array[4] == new_array[7] or new_array[2] == new_array[5] == new_array[8]:
-                bot.send_message(message.chat.id, text="Джекпот!!!")
+                bot.answer_callback_query(callback_query_id=call.id, text="Jackpot!!!", show_alert=True)
 
 
 def get_text_messages(bot, cur_user, message):
@@ -88,3 +103,12 @@ def get_text_messages(bot, cur_user, message):
         Slots.callback_inline(message, bot)
     elif ms_text == "Выход":
         MenuBot.goto_menu(bot, chat_id, "Главное меню")
+
+@bot.callback_query_handler(func=lambda call: True)
+def callback_worker(call, message, cls):
+    chat_d = call.message.chat.id
+    m_text = message.text
+    if call.data == "Слоты" or call.data == "Крутить":
+        cls.main_slots(call, bot)
+        Slots.callback_inline(chat_d, bot)
+        return

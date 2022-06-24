@@ -98,10 +98,10 @@ def goto_menu(bot, chat_id, name_menu):
 
 m_main = Menu("Главное меню", buttons=["Развлечения", "Игры", "ДЗ", "Помощь"], module="FUN")
 
-m_games = Menu("Игры", buttons=["Игра К-Н-Б", "Игра в 21", "Слоты", "Выход"], parent=m_main)
+m_games = Menu("Игры", buttons=["Игра К-Н-Б", "Игра в 21", "Слот-Машина", "Выход"], parent=m_main)
 m_game_21 = Menu("Игра в 21", buttons=["Карту!", "Стоп!", "Выход"], parent=m_games, module="Games")
 m_game_rsp = Menu("Игра К-Н-Б", buttons=["Камень", "Ножницы", "Бумага", "Выход"], parent=m_games, module="Games")
-m_game_rsp_MP = Menu("Слоты", buttons=["Крутить", "Выход"], parent=m_games, module="MyGame")
+m_game_rsp_MP = Menu("Слот-Машина", buttons=["Крутить", "Слоты", "Статистика", "Выход"], parent=m_games, module="MyGame")
 m_DZ = Menu("ДЗ", buttons=["Задание-1", "Задание-2", "Задание-3", "Задание-4", "Задание-5", "Задание-6", "Выход"], parent=m_main, module="DZ")
 
 m_fun = Menu("Развлечения", buttons=["Прислать собаку", "Прислать анекдот", "Выход"], parent=m_main, module="FUN")
