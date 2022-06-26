@@ -95,7 +95,18 @@ class Slots:
                 bot.answer_callback_query(callback_query_id=call.id, text="Jackpot!!!", show_alert=True)
 
 
-def get_text_messages(bot, cur_user, message):
+
+@bot.callback_query_handler(func=lambda call: True)
+def get_callback(cls, call, bot, markup):
+    if call.data == 'Крутить':
+        cls.main_slots(call, bot)
+        bot.edit_message_text(chat_id=call.message.chat.id, reply_markup=markup, text=call.message.text,
+                              message_id=call.message.message_id)
+        return
+    elif call.data == "Выход":
+        goto_menu(bot, call.message.chat.id, "Главное меню")
+
+def get_text_messages(bot, message):
     chat_id = message.chat.id
     ms_text = message.text
 
@@ -103,12 +114,3 @@ def get_text_messages(bot, cur_user, message):
         Slots.callback_inline(message, bot)
     elif ms_text == "Выход":
         MenuBot.goto_menu(bot, chat_id, "Главное меню")
-
-@bot.callback_query_handler(func=lambda call: True)
-def callback_worker(call, message, cls):
-    chat_d = call.message.chat.id
-    m_text = message.text
-    if call.data == "Слоты" or call.data == "Крутить":
-        cls.main_slots(call, bot)
-        Slots.callback_inline(chat_d, bot)
-        return
