@@ -1,15 +1,15 @@
+import telebot
 from telebot import types
 import pickle
 import os
 
-from main import bot
 from MyGame import Slots
 
+bot = telebot.TeleBot('5241329098:AAFwTwBMDbk8fD-GVHlXBlz52jI9X4SWoVk')
 
 # -----------------------------------------------------------------------------------------------------------------------
-
 @bot.callback_query_handler(func=lambda call: True)
-def main_menu_callback(call):
+def main_menu_callback(call, bot):
     if call.data == "Slots" or call.data == 'spin':
         Slots.callback_inline(call, bot)
 
@@ -17,13 +17,12 @@ def main_menu_callback(call):
 def gen_menu_keyboard(user_id, chat_type):
     keyboard = types.InlineKeyboardMarkup(row_width=3)
     menu_buttons = []
-    if chat_type[0:7] == "private":
+    if chat_type[0:7] == "":
         menu_buttons.extend([
             types.InlineKeyboardButton(text="Крутить", callback_data="Крутить")])
 
     keyboard.add(*menu_buttons)
     return keyboard
-
 
 class Users:
     activeUsers = {}
