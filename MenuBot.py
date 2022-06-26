@@ -2,7 +2,29 @@ from telebot import types
 import pickle
 import os
 
-# -----------------------------------------------------------------------
+from main import bot
+from MyGame import Slots
+
+
+# -----------------------------------------------------------------------------------------------------------------------
+
+@bot.callback_query_handler(func=lambda call: True)
+def main_menu_callback(call):
+    if call.data == "Slots" or call.data == 'spin':
+        Slots.callback_inline(call, bot)
+
+
+def gen_menu_keyboard(user_id, chat_type):
+    keyboard = types.InlineKeyboardMarkup(row_width=3)
+    menu_buttons = []
+    if chat_type[0:7] == "private":
+        menu_buttons.extend([
+            types.InlineKeyboardButton(text="Крутить", callback_data="Крутить")])
+
+    keyboard.add(*menu_buttons)
+    return keyboard
+
+
 class Users:
     activeUsers = {}
 
@@ -39,7 +61,7 @@ class Menu:
         self.name = name
         self.buttons = buttons
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=4)
-        markup.add(*buttons)  # Обратите внимание - звёздочка используется для распаковки списка
+        markup.add(*buttons)  # Звёздочка используется для распаковки списка
         self.markup = markup
         self.__class__.hash[name] = self  # в классе содержится словарь, со всеми экземплярами класса, обновим его
 
@@ -86,6 +108,10 @@ def goto_menu(bot, chat_id, name_menu):
     cur_menu = Menu.getCurMenu(chat_id)
     if name_menu == "Выход" and cur_menu != None and cur_menu.parent != None:
         target_menu = Menu.getMenu(chat_id, cur_menu.parent.name)
+    elif name_menu == "Слот-Машина":
+        #
+        bot.send_message(chat_id, "Ваши слоты:", reply_markup=gen_menu_keyboard(chat_id))
+        target_menu = Menu.getMenu(chat_id, name_menu)
     else:
         target_menu = Menu.getMenu(chat_id, name_menu)
 
@@ -101,10 +127,10 @@ m_main = Menu("Главное меню", buttons=["Развлечения", "И�
 m_games = Menu("Игры", buttons=["Игра К-Н-Б", "Игра в 21", "Слот-Машина", "Выход"], parent=m_main)
 m_game_21 = Menu("Игра в 21", buttons=["Карту!", "Стоп!", "Выход"], parent=m_games, module="Games")
 m_game_rsp = Menu("Игра К-Н-Б", buttons=["Камень", "Ножницы", "Бумага", "Выход"], parent=m_games, module="Games")
-m_game_rsp_MP = Menu("Слот-Машина", buttons=["Крутить", "Слоты", "Статистика", "Выход"], parent=m_games, module="MyGame")
-m_DZ = Menu("ДЗ", buttons=["Задание-1", "Задание-2", "Задание-3", "Задание-4", "Задание-5", "Задание-6", "Выход"], parent=m_main, module="DZ")
+m_game_rsp_MP = Menu("Слот-Машина", buttons=["Выход"], parent=m_games, module="MyGame")
+m_DZ = Menu("ДЗ", buttons=["Задание-1", "Задание-2", "Задание-3", "Задание-4", "Задание-5", "Задание-6", "Выход"],
+            parent=m_main, module="DZ")
 
 m_fun = Menu("Развлечения", buttons=["Прислать собаку", "Прислать анекдот", "Выход"], parent=m_main, module="FUN")
-
 
 Menu.loadCurMenu()

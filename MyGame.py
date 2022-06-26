@@ -109,8 +109,5 @@ def get_callback(cls, call, bot, markup):
 def get_text_messages(bot, message):
     chat_id = message.chat.id
     ms_text = message.text
-
-    if ms_text == "Слоты" or message.text == 'Крутить':
-        Slots.callback_inline(message, bot)
-    elif ms_text == "Выход":
+    if ms_text == "Выход":
         MenuBot.goto_menu(bot, chat_id, "Главное меню")
