@@ -1,6 +1,10 @@
 # Телеграм-бот v. 002 - Меню
-from telebot import types
-import telebot
+try:
+    from telebot import types
+    import telebot
+except ImportError:
+    print("Не импортнул бота")
+
 import MenuBot
 from MenuBot import Menu
 import Games
